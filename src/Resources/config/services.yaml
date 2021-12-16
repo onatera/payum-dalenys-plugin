@@ -1,0 +1,50 @@
+services:
+    app.onatera_payum_dalenys:
+      class: Payum\Core\Bridge\Symfony\Builder\GatewayFactoryBuilder
+      arguments: [ Onatera\PayumDalenysPlugin\Payum\DalenysGatewayFactory ]
+      tags:
+        - { name: payum.gateway_factory_builder, factory: dalenys }
+
+    Onatera\PayumDalenysPlugin\Controller\NotifyController:
+      autoconfigure: true
+      autowire: true
+
+    Onatera\PayumDalenysPlugin\Form\Type\DalenysGatewayConfigurationType:
+      tags:
+        - { name: sylius.gateway_configuration_type, type: dalenys, label: 'Dalenys' }
+        - { name: form.type }
+    
+    Onatera\PayumDalenysPlugin\Payum\Action\CaptureAction:
+      public: true
+      arguments:
+        - '@sylius.http_client'
+      tags:
+        - { name: payum.action, factory: dalenys, alias: payum.action.capture }
+
+    Onatera\PayumDalenysPlugin\Payum\Action\StatusAction:
+      public: true
+      arguments:
+        - '@sylius.http_client'
+      tags:
+        - { name: payum.action, factory: dalenys, alias: payum.action.status }
+
+    Onatera\PayumDalenysPlugin\Payum\Action\NotifyAction:
+      public: true
+      arguments:
+        - '@sylius.http_client'
+      tags:
+        - { name: payum.action, factory: dalenys, alias: payum.action.notify }
+
+    Onatera\PayumDalenysPlugin\Payum\Action\ReturnAction:
+        public: true
+        arguments:
+            - '@sylius.http_client'
+        tags:
+            - { name: payum.action, factory: dalenys, alias: payum.action.notify }
+
+    Onatera\PayumDalenysPlugin\Payum\Action\RefundAction:
+        public: true
+        arguments:
+            - '@sylius.http_client'
+        tags:
+            - { name: payum.action, factory: dalenys, alias: payum.action.notify }

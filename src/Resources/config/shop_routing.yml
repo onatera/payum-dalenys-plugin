@@ -1,0 +1,7 @@
+onatera_dalenys_notification:
+    path: /dalenys/notification
+    controller: Onatera\PayumDalenysPlugin\Controller\NotifyController
+
+onatera_dalenys_notification_compatibility:
+    path: /be2bill/transaction
+    controller: Onatera\PayumDalenysPlugin\Controller\NotifyController
