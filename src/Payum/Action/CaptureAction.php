@@ -61,7 +61,7 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
         }
 
         $cardFields = array('CARDCODE', 'CARDCVV', 'CARDVALIDITYDATE', 'CARDFULLNAME');
-        if (false == $model->validateNotEmpty($cardFields, false) && false == $model['ALIAS']) {
+        if (empty($model['HFTOKEN']) && false == $model->validateNotEmpty($cardFields, false) && false == $model['ALIAS']) {
             try {
                 $obtainCreditCard = new ObtainCreditCard($request->getToken());
                 $obtainCreditCard->setModel($request->getFirstModel());
@@ -83,8 +83,10 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
         }
 
         //instruction must have an alias set (e.g oneclick payment) or credit card info.
-        if (false == ($model['ALIAS'] || $model->validateNotEmpty($cardFields, false))) {
-            throw new LogicException('Either credit card fields or its alias has to be set.');
+        if (empty($model['HFTOKEN'])) {
+            if (false == ($model['ALIAS'] || $model->validateNotEmpty($cardFields, false))) {
+                throw new LogicException('Either credit card fields or its alias has to be set.');
+            }
         }
 
         $result = $this->api->payment($model->toUnsafeArray());
