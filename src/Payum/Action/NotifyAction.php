@@ -41,10 +41,6 @@ class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareIn
             throw new HttpResponse('The notification is invalid. Code 1', 400);
         }
 
-        if ($details['AMOUNT'] != $httpRequest->query['AMOUNT']) {
-            throw new HttpResponse('The notification is invalid. Code 2', 400);
-        }
-
         $details->replace($httpRequest->query);
 
         throw new HttpResponse('OK', 200);
