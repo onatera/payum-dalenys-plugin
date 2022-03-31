@@ -32,16 +32,6 @@ class NotifyController implements ContainerAwareInterface
             return new Response(sprintf('Payment for order %s not found.', $orderId), 400);
         }
         
-        try {
-            $payment = reset($payments);
-
-            $gateway = $this->container->get('payum')->getGateway('dalenys');
-
-            $gateway->execute(new Notify($payment));    
-        } catch (\Exception $e) {
-            return new Response($e->getMessage(), 500);
-        }
-
-        return new Response('', 204);
+        return new Response('', 200);
     }
 }
