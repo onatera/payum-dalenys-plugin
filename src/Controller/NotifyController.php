@@ -24,18 +24,23 @@ class NotifyController implements ContainerAwareInterface
         /** @var Order $order */
         $order = $this->container->get('sylius.repository.order')->findOneBy(['number' => $orderId]);
         if (null === $order) {
-            throw new NotFoundHttpException('');
+            return new Response(sprintf('Order not %s found.', $orderId), 400);
         }
 
         $payments = $this->container->get('sylius.repository.payment')->findBy(['order' => $order], ['createdAt' => 'DESC']);
         if (count($payments) === 0) {
-            throw new NotFoundHttpException('');
+            return new Response(sprintf('Payment for order %s not found.', $orderId), 400);
         }
-        $payment = reset($payments);
+        
+        try {
+            $payment = reset($payments);
 
-        $gateway = $this->container->get('payum')->getGateway('dalenys');
+            $gateway = $this->container->get('payum')->getGateway('dalenys');
 
-        $gateway->execute(new Notify($payment));
+            $gateway->execute(new Notify($payment));    
+        } catch (\Exception $e) {
+            return new Response($e->getMessage(), 500);
+        }
 
         return new Response('', 204);
     }
