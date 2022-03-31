@@ -32,6 +32,6 @@ class NotifyController implements ContainerAwareInterface
             return new Response(sprintf('Payment for order %s not found.', $orderId), 400);
         }
         
-        return new Response('', 200);
+        return new Response('OK', 200);
     }
 }
