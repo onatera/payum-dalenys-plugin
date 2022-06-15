@@ -40,9 +40,11 @@ class RefundAction implements ActionInterface, ApiAwareInterface, GatewayAwareIn
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
-        $details = $request->getModel();
+        $details = new ArrayObject($request->getModel());
 
         $result = $this->api->refund((array) $details);
+        
+        $details->replace((array) $result);
     }
 
     /**
