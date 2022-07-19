@@ -43,6 +43,7 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
         RequestNotSupportedException::assertSupports($this, $request);
 
         $model = new ArrayObject($request->getModel());
+        $model['3DSECUREPREFERENCE'] = 'frictionless';
 
         if (null !== $model['EXECCODE']) {
             if (Api::EXECCODE_3DSECURE_IDENTIFICATION_REQUIRED === $model['EXECCODE']) {
