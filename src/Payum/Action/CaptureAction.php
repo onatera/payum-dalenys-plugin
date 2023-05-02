@@ -43,6 +43,13 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
         RequestNotSupportedException::assertSupports($this, $request);
 
         $model = new ArrayObject($request->getModel());
+        $model['HFTOKEN'] = $request->getModel()['HFTOKEN'] ?? null;
+        $model['CARDFULLNAME'] = $request->getModel()['CARDFULLNAME'] ?? null;
+        $model['DESCRIPTION'] = $request->getModel()['DESCRIPTION'] ?? null;
+        $model['AMOUNT'] = $request->getModel()['AMOUNT'] ?? null;
+        $model['CLIENTIDENT'] = $request->getModel()['CLIENTIDENT'] ?? null;
+        $model['CLIENTEMAIL'] = $request->getModel()['CLIENTEMAIL'] ?? null;
+        $model['ORDERID'] = $request->getModel()['ORDERID'] ?? null;
         $model['3DSECUREPREFERENCE'] = 'frictionless';
 
         if (null !== $model['EXECCODE']) {
