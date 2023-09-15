@@ -5,6 +5,7 @@ namespace Onatera\PayumDalenysPlugin\Payum;
 use Onatera\PayumDalenysPlugin\Payum\Action\CaptureAction;
 use Onatera\PayumDalenysPlugin\Payum\Action\ConvertPaymentAction;
 use Onatera\PayumDalenysPlugin\Payum\Action\NotifyAction;
+use Onatera\PayumDalenysPlugin\Payum\Action\NotifyNullAction;
 use Onatera\PayumDalenysPlugin\Payum\Action\RefundAction;
 use Onatera\PayumDalenysPlugin\Payum\Action\ReturnAction;
 use Onatera\PayumDalenysPlugin\Payum\Action\StatusAction;
@@ -25,6 +26,7 @@ class DalenysGatewayFactory extends GatewayFactory
             'payum.action.return' => new ReturnAction(),
             'payum.action.status' => new StatusAction(),
             'payum.action.notify' => new NotifyAction(),
+            'payum.action.notify_null' => new NotifyNullAction(),
             'payum.action.refund' => new RefundAction(),
             'payum.action.convert_payment' => new ConvertPaymentAction(),
         ));

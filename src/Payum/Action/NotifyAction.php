@@ -38,7 +38,7 @@ class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareIn
         $this->gateway->execute($httpRequest = new GetHttpRequest());
 
         if (false == $this->api->verifyHash($httpRequest->query)) {
-            throw new HttpResponse('The notification is invalid. Code 1', 400);
+            throw new HttpResponse('The notification is invalid. Code 101', 400);
         }
 
         $details->replace($httpRequest->query);

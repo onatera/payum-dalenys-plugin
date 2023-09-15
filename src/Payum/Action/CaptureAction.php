@@ -19,14 +19,19 @@ use Payum\Core\Request\GetHttpRequest;
 use Payum\Core\Request\Notify;
 use Payum\Core\Request\ObtainCreditCard;
 use Payum\Core\Exception\RequestNotSupportedException;
+use Payum\Core\Security\GenericTokenFactoryInterface;
 use Payum\Core\Security\SensitiveValue;
+use Payum\Core\Security\TokenFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Payum\Core\Security\GenericTokenFactoryAwareInterface;
+use Payum\Core\Security\GenericTokenFactoryAwareTrait;
 
-class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface, RequestStackAwareInterface
+class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface, RequestStackAwareInterface, GenericTokenFactoryAwareInterface
 {
     use GatewayAwareTrait;
     use ApiAwareTrait;
     use RequestStackAwareTrait;
+    use GenericTokenFactoryAwareTrait;
 
     public function __construct()
     {
@@ -42,9 +47,7 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
-        $model = new ArrayObject();
-        $model['CARDFULLNAME'] = $request->getModel()['CARDFULLNAME'] ?? null;
-        $model['HFTOKEN'] = $request->getModel()['HFTOKEN'] ?? null;
+        $model = new ArrayObject($request->getModel());
         $model['3DSECUREPREFERENCE'] = 'frictionless';
 
         if (null !== $model['EXECCODE']) {
@@ -62,6 +65,26 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
             $this->gateway->execute($httpRequest = new GetHttpRequest());
             $model['CLIENTIP'] = $httpRequest->clientIp;
         }
+
+        $extradata = [];
+        if ($model['EXTRADATA']) {
+            $extradata = json_decode($model['EXTRADATA'], true);
+        }
+        if (empty($extradata)) {
+            $extradata = [];
+        }
+        if (!array_key_exists('notify_token', $extradata)) {
+            $token = $this->tokenFactory->createNotifyToken(
+                $request->getToken()->getGatewayName(),
+                $request->getToken()->getDetails()
+            )->getHash();
+
+            $extradata['notify_token'] = $token;
+        }
+        if (!array_key_exists('capture_timestamp', $extradata)) {
+            $extradata['capture_timestamp'] = time();
+        }
+        $model['EXTRADATA'] = json_encode($extradata);
 
         $cardFields = array('CARDCODE', 'CARDCVV', 'CARDVALIDITYDATE', 'CARDFULLNAME');
         if (empty($model['HFTOKEN']) && false == $model->validateNotEmpty($cardFields, false) && false == $model['ALIAS']) {
