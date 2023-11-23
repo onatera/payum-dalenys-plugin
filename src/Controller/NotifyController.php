@@ -28,9 +28,9 @@ class NotifyController implements ContainerAwareInterface
             return new Response(sprintf('Order not %s found.', $orderId), 400);
         }
 
-        if ($request->query->get('EXECCODE') === Api::EXECCODE_SUCCESSFUL && ($order->getPaymentState() === Payment::STATE_CANCELLED || $order->getState() === Order::STATE_CANCELLED)) {
+        if ($request->query->get('EXECCODE') === Api::EXECCODE_SUCCESSFUL && $order->getPaymentState() === Payment::STATE_CANCELLED && $order->getState() === Order::STATE_CANCELLED) {
             $logger = $this->container->get('logger');
-            $logger->critical('[Dalenys] Order paided and cancelled.', [
+            $logger->error('[Dalenys] Order paided and cancelled.', [
                 'orderId' => $orderId,
                 'transactionId' => $request->query->get('TRANSACTIONID'),
             ]);
