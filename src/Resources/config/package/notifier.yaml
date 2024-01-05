@@ -1,0 +1,4 @@
+framework:
+  notifier:
+    chatter_transports:
+      microsoftteams: 'null://null' #'%env(MICROSOFT_TEAMS_DSN)%' à changer avec la bonne

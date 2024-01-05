@@ -8,6 +8,9 @@ services:
     Onatera\PayumDalenysPlugin\Controller\NotifyController:
       autoconfigure: true
       autowire: true
+      arguments:
+        $chatter: '@chatter'
+      tags: [ 'controller.service_arguments' ]
 
     Onatera\PayumDalenysPlugin\Form\Type\DalenysGatewayConfigurationType:
       tags:

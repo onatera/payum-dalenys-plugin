@@ -12,7 +12,8 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "sylius/sylius": "^1.10 || ^1.11"
+        "sylius/sylius": "^1.10 || ^1.11",
+        "symfony/microsoft-teams-notifier": "^6.4"
     },
     "require-dev": {
         "behat/behat": "^3.6.1",
