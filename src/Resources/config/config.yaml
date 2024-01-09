@@ -1,0 +1,4 @@
+framework:
+  notifier:
+    chatter_transports:
+      dalenys_microsoft_teams_chatter: '%env(DALENYS_MICROSOFT_TEAMS_DSN)%'
