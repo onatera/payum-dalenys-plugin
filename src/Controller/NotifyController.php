@@ -60,7 +60,7 @@ class NotifyController implements ContainerAwareInterface
 
             $this->sendAlertChatMessage($order->getId(), $orderNumber, $request->query->get('TRANSACTIONID'));
 
-            return new Response(sprintf('Order %s paid and canceled.', $orderNumber), 200);
+            return new Response('OK', 200);
         }
 
         $payments = $this->container->get('sylius.repository.payment')->findBy(['order' => $order],
