@@ -49,6 +49,7 @@ class NotifyController implements ContainerAwareInterface
         }
 
         if ($request->query->get('EXECCODE') === Api::EXECCODE_SUCCESSFUL
+            && $request->query->get('OPERATIONTYPE') === Api::OPERATION_PAYMENT
             && $order->getPaymentState() === Payment::STATE_CANCELLED
             && $order->getState() === Order::STATE_CANCELLED
         ) {
