@@ -104,7 +104,7 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
     /**
      * {@inheritDoc}
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return
             $request instanceof Capture &&
