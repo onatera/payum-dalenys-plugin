@@ -50,7 +50,7 @@ class RefundAction implements ActionInterface, ApiAwareInterface, GatewayAwareIn
     /**
      * {@inheritDoc}
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return
             $request instanceof Refund &&

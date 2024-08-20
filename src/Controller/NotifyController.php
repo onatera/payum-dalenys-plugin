@@ -3,38 +3,34 @@
 namespace Onatera\PayumDalenysPlugin\Controller;
 
 use Onatera\PayumDalenysPlugin\Payum\Api;
+use Psr\Log\LoggerInterface;
 use Sylius\Component\Core\Model\Payment;
-use Payum\Bundle\PayumBundle\Controller\PayumController;
-use Payum\Core\Request\Notify;
 use Sylius\Component\Core\Model\Order;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Sylius\Component\Core\Repository\OrderRepositoryInterface;
+use Sylius\Component\Core\Repository\PaymentRepositoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\OpenUriAction;
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field\Image;
 use Symfony\Component\Notifier\ChatterInterface;
-use Symfony\Component\Notifier\Chatter;
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\ActionCard;
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\HttpPostAction;
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input\TextInput;
-use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Input\DateInput;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsOptions;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Section;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field\Fact;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
-class NotifyController implements ContainerAwareInterface
+class NotifyController
 {
     private const CHATTER = 'dalenys_microsoft_teams_chatter';
-    use ContainerAwareTrait;
 
-    public function __construct(private ChatterInterface $chatter, private UrlGeneratorInterface $urlGenerator)
+    public function __construct(
+        private ChatterInterface $chatter,
+        private UrlGeneratorInterface $urlGenerator,
+        private OrderRepositoryInterface $orderRepository,
+        private LoggerInterface $logger,
+        private PaymentRepositoryInterface $paymentRepository,
+    )
     {
     }
 
@@ -43,7 +39,7 @@ class NotifyController implements ContainerAwareInterface
         $orderNumber = $request->query->get('ORDERID');
 
         /** @var Order $order */
-        $order = $this->container->get('sylius.repository.order')->findOneBy(['number' => $orderNumber]);
+        $order = $this->orderRepository->findOneBy(['number' => $orderNumber]);
         if (null === $order) {
             return new Response(sprintf('Order not %s found.', $orderNumber), 400);
         }
@@ -53,8 +49,8 @@ class NotifyController implements ContainerAwareInterface
             && $order->getPaymentState() === Payment::STATE_CANCELLED
             && $order->getState() === Order::STATE_CANCELLED
         ) {
-            $logger = $this->container->get('logger');
-            $logger->error('[Dalenys] Order paid and canceled.', [
+
+            $this->logger->error('[Dalenys] Order paid and canceled.', [
                 'orderId' => $orderNumber,
                 'transactionId' => $request->query->get('TRANSACTIONID'),
             ]);
@@ -64,7 +60,7 @@ class NotifyController implements ContainerAwareInterface
             return new Response('OK', 200);
         }
 
-        $payments = $this->container->get('sylius.repository.payment')->findBy(['order' => $order],
+        $payments = $this->paymentRepository->findBy(['order' => $order],
             ['createdAt' => 'DESC']);
         if (count($payments) === 0) {
             return new Response(sprintf('Payment for order %s not found.', $orderNumber), 400);

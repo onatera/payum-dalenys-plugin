@@ -36,7 +36,7 @@ class ConvertPaymentAction implements ActionInterface
     /**
      * {@inheritDoc}
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return
             $request instanceof Convert &&
