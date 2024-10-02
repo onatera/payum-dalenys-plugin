@@ -95,7 +95,14 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
         $model->replace((array) $result);
 
         if (Api::EXECCODE_3DSECURE_IDENTIFICATION_REQUIRED === $model['EXECCODE']) {
-            $this->requestStack->getSession()->set('payum_token', $request->getToken()->getHash());
+            $session = $this->requestStack->getSession();
+            if ($session->isStarted()) {
+                // force refresh to avoid lock expiration
+                $session->save();
+                $session->start();
+            }
+
+            $session->set('payum_token', $request->getToken()->getHash());
 
             throw new HttpResponse(base64_decode($model['REDIRECTHTML']), 302);
         }
